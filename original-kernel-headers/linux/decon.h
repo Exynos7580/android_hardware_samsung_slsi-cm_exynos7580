@@ -537,7 +537,11 @@ struct disp_ss_size_info {
 struct esd_protect {
 	u32 pcd_irq;
 	u32 err_irq;
+	int pcd_irq_active;
+	int err_irq_active;
 	u32 pcd_gpio;
+	u32 err_gpio;
+
 	struct workqueue_struct *esd_wq;
 	struct work_struct esd_work;
 	u32	queuework_pending;
@@ -676,6 +680,7 @@ struct decon_device {
 	unsigned int force_fullupdate;
 
 	struct decon_regs_data win_regs;
+	u32		esd_total;
 };
 
 static inline struct decon_device *get_decon_drvdata(u32 id)
