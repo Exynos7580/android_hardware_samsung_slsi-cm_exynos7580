@@ -20,7 +20,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
-LOCAL_SHARED_LIBRARIES := liblog libcutils libion libutils
+LOCAL_SHARED_LIBRARIES := liblog libcutils libion libutils libstlport
 
 LOCAL_C_INCLUDES := hardware/samsung_slsi-cm/exynos7580/include
 
