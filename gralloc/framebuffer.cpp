@@ -41,6 +41,7 @@
 #endif
 
 #include "gralloc_priv.h"
+#include "gralloc_vsync.h"
 #include "decon-fb.h"
 
 /*****************************************************************************/
@@ -65,6 +66,12 @@ struct fb_context_t {
 
 /*****************************************************************************/
 
+/*
+ * Keep track of the vsync state to avoid making excessive ioctl calls.
+ * States: -1 --> unknown; 0 --> disabled; 1 --> enabled.
+ */
+static int vsync_state = -1;
+
 static enum decon_pixel_format exynos5_format_to_decon(int format)
 {
     switch (format) {
@@ -84,10 +91,25 @@ static enum decon_pixel_format exynos5_format_to_decon(int format)
 static int fb_setSwapInterval(struct framebuffer_device_t* dev,
                               int interval)
 {
-    fb_context_t* ctx = (fb_context_t*)dev;
-    if (interval < dev->minSwapInterval || interval > dev->maxSwapInterval)
-        return -EINVAL;
-    // FIXME: implement fb_setSwapInterval
+    if (interval < dev->minSwapInterval) {
+        interval = dev->minSwapInterval;
+    } else if (interval > dev->maxSwapInterval) {
+        interval = dev->maxSwapInterval;
+    }
+
+    private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
+    m->swapInterval = interval;
+
+    if (interval == 0 && vsync_state != 0) {
+        gralloc_vsync_disable(dev);
+        vsync_state = 0;
+    } else if (vsync_state != 1) {
+        gralloc_vsync_enable(dev);
+        vsync_state = 1;
+    }
+
+    ALOGV("%s: vsync state is: %d", __func__, vsync_state);
+
     return 0;
 }
 

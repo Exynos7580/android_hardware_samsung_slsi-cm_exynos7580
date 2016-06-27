@@ -58,6 +58,7 @@ struct private_module_t {
     float xdpi;
     float ydpi;
     float fps;
+    int swapInterval;
     int fb_fd;
     int enableVSync;
     void *queue;
