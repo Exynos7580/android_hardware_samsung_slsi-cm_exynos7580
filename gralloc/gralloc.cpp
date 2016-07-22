@@ -150,6 +150,7 @@ struct private_module_t HAL_MODULE_INFO_SYM = {
     xdpi: 0.0f,
     ydpi: 0.0f,
     fps: 0.0f,
+	swapInterval: 0,
     fb_fd: 0,
     enableVSync: 0,
     queue: NULL,
