@@ -80,6 +80,8 @@ else
     LOCAL_MODULE    := provisioningagent
 endif
 
+LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
+
 LOCAL_MODULE_TAGS := debug eng optional
 
 include $(BUILD_STATIC_LIBRARY)
