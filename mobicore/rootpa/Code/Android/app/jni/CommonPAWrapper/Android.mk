@@ -50,6 +50,8 @@ endif
 # Build for the first arch (64-bit)
 LOCAL_MULTILIB := first
 
+LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
+
 LOCAL_SRC_FILES += commonwrapper.cpp
 LOCAL_SRC_FILES += JniHelpers.cpp
 LOCAL_SRC_FILES += CmpResponses.cpp
