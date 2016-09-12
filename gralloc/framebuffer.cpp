@@ -138,8 +138,8 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
     cfg[0].plane_alpha = 255;
     cfg[0].blending = DECON_BLENDING_NONE;
     cfg[0].idma_type = IDMA_G0;
-    cfg[0].src = {0, 0, mod->xres, mod->yres, mod->xres, mod->yres};
-    cfg[0].dst = {0, 0, mod->xres, mod->yres, mod->xres, mod->yres};
+    cfg[0].src = {0, 0, __u32(mod->xres), __u32(mod->yres), __u32(mod->xres), __u32(mod->yres)};
+    cfg[0].dst = {0, 0, __u32(mod->xres), __u32(mod->yres), __u32(mod->xres), __u32(mod->yres)};
     cfg[0].format = exynos5_format_to_decon(handle->format);
     cfg[0].fence_fd = -1;
 
