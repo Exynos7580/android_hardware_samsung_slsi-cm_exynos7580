@@ -52,7 +52,7 @@ inline size_t roundUpToPageSize(size_t x) {
 
 // numbers of buffers for page flipping
 #define NUM_BUFFERS 2
-#define HWC_EXIST 1
+#define HWC_EXIST 0
 
 struct hwc_callback_entry
 {
