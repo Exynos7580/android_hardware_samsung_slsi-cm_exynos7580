@@ -59,6 +59,9 @@ struct private_module_t {
     void *queue;
     pthread_mutex_t queue_lock;
 
+    int fb_fd;
+    int enableVSync;
+
 };
 
 /*****************************************************************************/
