@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Samsung Electronics Co. LTD
+ *           2017, Apavayan < info@apavayan.com >
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -315,29 +316,34 @@ enum pipeline {
 };
 
 enum fimc_is_video_dev_num {
-    FIMC_IS_VIDEO_SS0_NUM               = 100,
-    FIMC_IS_VIDEO_SS1_NUM               = 101,
-    FIMC_IS_VIDEO_SS2_NUM               = 102,
-    FIMC_IS_VIDEO_SS3_NUM               = 103,
-    FIMC_IS_VIDEO_3A0_NUM               = 110,
-    FIMC_IS_VIDEO_3A0C_NUM              = 111,
-    FIMC_IS_VIDEO_3A0P_NUM              = 112,
-    FIMC_IS_VIDEO_3A1_NUM               = 114,
-    FIMC_IS_VIDEO_3A1C_NUM              = 115,
-    FIMC_IS_VIDEO_3A1P_NUM              = 116,
-    FIMC_IS_VIDEO_ISP_NUM               = 130,
-    FIMC_IS_VIDEO_SCC_NUM               = 134,
-    FIMC_IS_VIDEO_SCP_NUM               = 137,
-    FIMC_IS_VIDEO_VDC_NUM               = 140,
-    FIMC_IS_VIDEO_VDO_NUM               = 141,
-    FIMC_IS_VIDEO_FD_NUM                = 146,
-    FIMC_IS_VIDEO_MAX_NUM               = 149,
+    FIMC_IS_VIDEO_SS0_NUM = 101,
+    FIMC_IS_VIDEO_SS1_NUM,
+    FIMC_IS_VIDEO_SS2_NUM,
+    FIMC_IS_VIDEO_SS3_NUM,
+    FIMC_IS_VIDEO_30S_NUM = 110,
+    FIMC_IS_VIDEO_30C_NUM,
+    FIMC_IS_VIDEO_30P_NUM,
+    FIMC_IS_VIDEO_31S_NUM = 120,
+    FIMC_IS_VIDEO_31C_NUM,
+    FIMC_IS_VIDEO_31P_NUM,
+    FIMC_IS_VIDEO_I0S_NUM = 130,
+    FIMC_IS_VIDEO_I0C_NUM,
+    FIMC_IS_VIDEO_I0P_NUM,
+    FIMC_IS_VIDEO_I1S_NUM = 140,
+    FIMC_IS_VIDEO_I1C_NUM,
+    FIMC_IS_VIDEO_I1P_NUM,
+    FIMC_IS_VIDEO_DIS_NUM = 150,
+    FIMC_IS_VIDEO_SCC_NUM,
+    FIMC_IS_VIDEO_SCP_NUM,
+    FIMC_IS_VIDEO_VRA_NUM = 160,
+    FIMC_IS_VIDEO_MAX_NUM
+
 };
 
 typedef enum
 {
     SENSOR_NAME_NOTHING             = 0,
-    SENSOR_NAME_S5K3H2              = 1, // 1 ~ 100, SLSI sensors
+    SENSOR_NAME_S5K3H2              = 1,
     SENSOR_NAME_S5K6A3              = 2,
     SENSOR_NAME_S5K3H5              = 3,
     SENSOR_NAME_S5K3H7              = 4,
@@ -349,13 +355,29 @@ typedef enum
     SENSOR_NAME_S5K2P2              = 10,
     SENSOR_NAME_S5K8B1              = 11,
     SENSOR_NAME_S5K1P2              = 12,
+    SENSOR_NAME_S5K2P2_12M          = 15,
+    SENSOR_NAME_S5K6D1              = 16,
+    SENSOR_NAME_S5K5E3              = 17,
+    SENSOR_NAME_S5K2T2              = 18,
+    SENSOR_NAME_S5K2P3              = 19,
+    SENSOR_NAME_S5K4E6              = 21,
+    SENSOR_NAME_S5K3P3              = 23,
+    SENSOR_NAME_S5K4EC              = 57,
+    SENSOR_NAME_SR352               = 57,
+    SENSOR_NAME_SR030               = 57,
 
-    SENSOR_NAME_IMX135              = 101, // 101 ~ 200 Sony sensors
+    SENSOR_NAME_IMX135              = 101, /* 101 ~ 200 Sony sensors */
+    SENSOR_NAME_IMX240              = 104,
+    SENSOR_NAME_IMX228              = 106,
+    SENSOR_NAME_IMX219              = 107,
 
-    SENSOR_NAME_SR261               = 201, // 201 ~ 300 Other vendor sensors
+    SENSOR_NAME_SR261               = 201, /* 201 ~ 300 Other vendor sensors */
+    SENSOR_NAME_SR544               = 203,
+    SENSOR_NAME_OV5670              = 204,
 
-    SENSOR_NAME_END,
     SENSOR_NAME_CUSTOM              = 301,
+    SENSOR_NAME_SR200               = 302,
+    SENSOR_NAME_END,
 /* HACK: Remove this define after Driver commonized */
     SENSOR_NAME_IMX134,
     SENSOR_NAME_S5K4H5,
