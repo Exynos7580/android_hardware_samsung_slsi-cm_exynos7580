@@ -43,7 +43,6 @@
 
 #include "gralloc_priv.h"
 #include "gralloc_vsync.h"
-#include "decon-fb.h"
 
 inline size_t roundUpToPageSize(size_t x) {
     return (x + (PAGE_SIZE-1)) & ~(PAGE_SIZE-1);
@@ -54,8 +53,7 @@ inline size_t roundUpToPageSize(size_t x) {
 // numbers of buffers for page flipping
 #define NUM_BUFFERS 2
 const size_t NUM_HW_WINDOWS = 7;
-
-#define FBIO_WAITFORVSYNC       _IOW('F', 0x20, __u32)
+#define HWC_EXIST 1
 
 struct hwc_callback_entry
 {
@@ -105,50 +103,44 @@ static int fb_setSwapInterval(struct framebuffer_device_t* dev,
 
 static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 {
-    struct private_module_t* mod = (private_module_t*)dev->common.module;
-    private_handle_t *handle = private_handle_t::dynamicCast(buffer);
-    struct decon_win_config_data win_data;
-    struct decon_win_config *cfg = win_data.config;
-
-    memset(cfg, 0, sizeof(win_data.config));
-    for (size_t i = 0; i < NUM_HW_WINDOWS; i++)
-        cfg[i].fence_fd = -1;
-
     if (private_handle_t::validate(buffer) < 0)
         return -EINVAL;
 
-    cfg[0].state = cfg->DECON_WIN_STATE_BUFFER;
-    cfg[0].fd_idma[0] = handle->fd;
-    cfg[0].fd_idma[1]= -1;
-    cfg[0].fd_idma[2]= -1;
-    cfg[0].plane_alpha = 255;
-    cfg[0].blending = DECON_BLENDING_NONE;
-    cfg[0].idma_type = IDMA_G0;
-    cfg[0].src = {0, 0, __u32(mod->xres), __u32(mod->yres), __u32(mod->xres), __u32(mod->yres)};
-    cfg[0].dst = {0, 0, __u32(mod->xres), __u32(mod->yres), __u32(mod->xres), __u32(mod->yres)};
-    cfg[0].format = exynos5_format_to_decon(handle->format);
-    cfg[0].fence_fd = -1;
-
-    int ret = ioctl(mod->fb_fd, S3CFB_WIN_CONFIG, &win_data);
-    for (size_t i = 0; i < NUM_HW_WINDOWS; i++)
-        if (cfg[i].fence_fd != -1)
-            close(cfg[i].fence_fd);
-    if (ret < 0) {
-        ALOGE("%s: ioctl S3CFB_WIN_CONFIG failed: %s", __FUNCTION__, strerror(errno));
-        return ret;
+    private_handle_t const* hnd = reinterpret_cast<private_handle_t const*>(buffer);
+    private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
+#if HWC_EXIST
+    hwc_callback_queue_t *queue = reinterpret_cast<hwc_callback_queue_t *>(m->queue);
+    pthread_mutex_lock(&m->queue_lock);
+    if(queue->isEmpty())
+        pthread_mutex_unlock(&m->queue_lock);
+    else {
+        private_handle_t *hnd = private_handle_t::dynamicCast(buffer);
+        struct hwc_callback_entry entry = queue->top();
+        queue->pop();
+        pthread_mutex_unlock(&m->queue_lock);
+        entry.callback(entry.data, hnd);
     }
+#else
+    // If we can't do the page_flip, just copy the buffer to the front
+    // FIXME: use copybit HAL instead of memcpy
+    void* fb_vaddr;
+    void* buffer_vaddr;
 
-    close(win_data.fence);
+    m->base.lock(&m->base, m->framebuffer,
+            GRALLOC_USAGE_SW_WRITE_RARELY,
+            0, 0, m->info.xres, m->info.yres,
+            &fb_vaddr);
 
-    if (mod->enableVSync) {
-        unsigned int test=0;
+    m->base.lock(&m->base, buffer,
+            GRALLOC_USAGE_SW_READ_RARELY,
+            0, 0, m->info.xres, m->info.yres,
+            &buffer_vaddr);
 
-        if (ioctl(mod->fb_fd, FBIO_WAITFORVSYNC, &test) < 0) {
-            ALOGE("%s FBIO_WAITFORVSYNC failed", __FUNCTION__);
-            return 0;
-        }
-    }
+    memcpy(fb_vaddr, buffer_vaddr, m->finfo.line_length * m->info.yres);
 
+    m->base.unlock(&m->base, buffer);
+    m->base.unlock(&m->base, m->framebuffer);
+#endif
     return 0;
 }
 
@@ -165,103 +157,80 @@ static int fb_close(struct hw_device_t *dev)
 
 int init_fb(struct private_module_t* module)
 {
+    char const * const device_template[] = {
+        "/dev/graphics/fb%u",
+        "/dev/fb%u",
+        NULL
+    };
+
     int fd = -1;
-    char name[64];
+    int i = 0;
 
     fd = open("/dev/graphics/fb0", O_RDWR);
     if (fd < 0) {
-        ALOGE("%s: /dev/graphics/fb0 Open fail", __FUNCTION__);
+        ALOGE("/dev/graphics/fb0 Open fail");
         return -errno;
     }
 
     struct fb_fix_screeninfo finfo;
     if (ioctl(fd, FBIOGET_FSCREENINFO, &finfo) == -1) {
-        ALOGE("%s: Fail to get FB Screen Info", __FUNCTION__);
+        ALOGE("Fail to get FB Screen Info");
         close(fd);
         return -errno;
     }
 
     struct fb_var_screeninfo info;
     if (ioctl(fd, FBIOGET_VSCREENINFO, &info) == -1) {
-        ALOGE("%s: First, Fail to get FB VScreen Info", __FUNCTION__);
+        ALOGE("First, Fail to get FB VScreen Info");
         close(fd);
         return -errno;
     }
 
-    info.reserved[0] = info.xres;
-    info.reserved[1] = info.yres;
-    info.reserved[2] = 0;
-    info.reserved[3] = 0;
-
-    info.xoffset = 0;
-    info.yoffset = 0;
-    info.activate = FB_ACTIVATE_NOW;
-
-#ifdef GRALLOC_16_BITS
-    /*
-     * Explicitly request 5/6/5
-     */
-    info.bits_per_pixel = 16;
-    info.red.offset     = 11;
-    info.red.length     = 5;
-    info.green.offset   = 5;
-    info.green.length   = 6;
-    info.blue.offset    = 0;
-    info.blue.length    = 5;
-    info.transp.offset  = 0;
-    info.transp.length  = 0;
-#else
-    /*
-     * Explicitly request 8/8/8
-     */
-    info.bits_per_pixel = 32;
-    info.red.offset     = 16;
-    info.red.length     = 8;
-    info.green.offset   = 8;
-    info.green.length   = 8;
-    info.blue.offset    = 0;
-    info.blue.length    = 8;
-    info.transp.offset  = 0;
-    info.transp.length  = 0;
-#endif
-
-    if (ioctl(fd, FBIOPUT_VSCREENINFO, &info) == -1) {
-        ALOGW("%s: FBIOPUT_VSCREENINFO failed", __FUNCTION__);
-    }
-
-    int32_t refreshRate = 1000000000000000LLU /
-    (
-        uint64_t( info.upper_margin + info.lower_margin + info.yres)
-        * ( info.left_margin  + info.right_margin + info.xres)
-        * info.pixclock
-    );
+    int refreshRate = 1000000000000000LLU /
+        (
+         uint64_t( info.upper_margin + info.lower_margin + info.vsync_len + info.yres )
+         * ( info.left_margin  + info.right_margin + info.hsync_len + info.xres )
+         * info.pixclock
+        );
 
     if (refreshRate == 0)
-        refreshRate = 60 * 1000;  /* 60 Hz */
+        refreshRate = 60*1000;  /* 60 Hz */
 
     float xdpi = (info.xres * 25.4f) / info.width;
     float ydpi = (info.yres * 25.4f) / info.height;
+    float fps  = refreshRate / 1000.0f;
+
     ALOGI("using (id=%s)\n"
           "xres         = %d px\n"
           "yres         = %d px\n"
           "width        = %d mm (%f dpi)\n"
           "height       = %d mm (%f dpi)\n"
           "refresh rate = %.2f Hz\n",
-          finfo.id, info.xres, info.yres, info.width, xdpi, info.height,
-          ydpi, (float)(refreshRate / 1000));
+          finfo.id, info.xres, info.yres, info.width,  xdpi, info.height, ydpi,
+          fps);
 
     module->xres = info.xres;
     module->yres = info.yres;
     module->line_length = info.xres;
     module->xdpi = xdpi;
     module->ydpi = ydpi;
-    module->fps = (float)(refreshRate / 1000);
-    module->fb_fd = fd;
+    module->fps = fps;
+    module->info = info;
+    module->finfo = finfo;
 
-    memcpy(&module->info, &info, sizeof(struct fb_var_screeninfo));
-    memcpy(&module->finfo, &finfo, sizeof(struct fb_fix_screeninfo));
+    size_t fbSize = roundUpToPageSize(finfo.line_length * info.yres_virtual);
+    module->framebuffer = new private_handle_t(dup(fd), fbSize, 0);
 
-    //close(fd);
+    void* vaddr = mmap(0, fbSize, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+    if (vaddr == MAP_FAILED) {
+        ALOGE("Error mapping the framebuffer (%s)", strerror(errno));
+        close(fd);
+        return -errno;
+    }
+    module->framebuffer->base = vaddr;
+    memset(vaddr, 0, fbSize);
+
+    close(fd);
 
     return 0;
 }

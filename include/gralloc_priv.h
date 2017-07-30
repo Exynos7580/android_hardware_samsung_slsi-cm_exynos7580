@@ -59,9 +59,6 @@ struct private_module_t {
     void *queue;
     pthread_mutex_t queue_lock;
 
-    int fb_fd;
-    int enableVSync;
-
 };
 
 /*****************************************************************************/
@@ -168,12 +165,6 @@ struct private_handle_t {
             if(handle != 0)
             {
                 ALOGE("invalid gralloc handle (at %p)", handle);
-                if (hnd->numInts != sNumInts)
-                    ALOGE("hnd->numInts != sNumInts (%d != %d)", hnd->numInts, sNumInts);
-                if (hnd->numFds != sNumFds)
-                    ALOGE("hnd->numFds != sNumFds (%d != %d)", hnd->numFds, sNumFds);
-                if (hnd->magic != sMagic)
-                    ALOGE("hnd->magic != sMagic (%d != %d)", hnd->magic, sMagic);
             }
             return -EINVAL;
         }
