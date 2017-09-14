@@ -81,32 +81,32 @@ inline decon_pixel_format halFormatToSocFormat(int format)
 
 static decon_idma_type getIdmaType(int32_t index)
 {
-    decon_idma_type ret = IDMA_G1;
+    decon_idma_type ret = IDMA_G0;
 
     switch(index) {
     case 0:
-        ret = IDMA_G1;
+        ret = IDMA_G0;
         break;
     case 1:
-        ret = IDMA_G2;
+        ret = IDMA_G1;
         break;
     case 2:
-        ret = IDMA_G3;
-        break;
-    case 3:
         ret = IDMA_VG0;
         break;
-    case 4:
+    case 3:
         ret = IDMA_VG1;
         break;
-    case 5:
+    case 4:
         ret = IDMA_VGR0;
         break;
-    case 6:
+    case 5:
         ret = IDMA_VGR1;
         break;
+    case 6:
+        ret = IDMA_G2;
+        break;
     case 7:
-        ret = IDMA_G0;
+        ret = IDMA_G3;
         break;
     default:
         ALOGE("%s: cannot handle index %d", __func__, index);
