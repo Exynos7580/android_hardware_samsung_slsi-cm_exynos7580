@@ -39,7 +39,7 @@
 #define BLENDING_MAX        DECON_BLENDING_MAX
 #define PIXEL_FORMAT_MAX    DECON_PIXEL_FORMAT_MAX
 
-const size_t SOC_NUM_HW_WINDOWS = MAX_DECON_WIN;
+const size_t SOC_NUM_HW_WINDOWS = 6;
 
 typedef decon_win_config fb_win_config;
 typedef decon_win_config_data fb_win_config_data;
