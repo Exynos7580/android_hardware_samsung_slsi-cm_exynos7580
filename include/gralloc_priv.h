@@ -105,6 +105,7 @@ struct private_handle_t {
         void*    base2;
         uint64_t padding2;
     };
+
     ion_user_handle_t handle;
     ion_user_handle_t handle1;
     ion_user_handle_t handle2;
