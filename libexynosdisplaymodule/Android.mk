@@ -35,7 +35,7 @@ LOCAL_C_INCLUDES := \
 	$(TOP)/frameworks/native/libs/nativewindow/include
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
+	INSTALLED_KERNEL_HEADERS
 
 LOCAL_SRC_FILES := \
 	ExynosPrimaryDisplay.cpp
