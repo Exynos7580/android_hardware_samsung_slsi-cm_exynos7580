@@ -41,7 +41,7 @@ LOCAL_SRC_FILES := \
 	ExynosPrimaryDisplay.cpp
 
 LOCAL_MODULE_TAGS := eng
-LOCAL_MODULE := libexynosdisplaymodule
+LOCAL_MODULE := libdisplaymodule
 include $(BUILD_SHARED_LIBRARY)
 
 endif

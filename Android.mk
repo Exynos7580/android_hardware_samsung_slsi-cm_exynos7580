@@ -20,7 +20,7 @@ ifeq ($(TARGET_SOC), exynos7580)
 exynos7580_dirs := \
 	mobicore \
 	gralloc \
-	libexynosdisplaymodule \
+	libdisplaymodule \
 	libhwcutilsmodule \
 	libhdmimodule \
 	libhwjpeg \
