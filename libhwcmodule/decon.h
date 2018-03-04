@@ -159,7 +159,15 @@ struct decon_win_config_data {
     struct decon_win_config config[MAX_DECON_WIN + 1];
 };
 
+enum decon_doze_mode {
+	DECON_DOZE_STATE_NORMAL = 0,
+	DECON_DOZE_STATE_DOZE,
+	DECON_DOZE_STATE_SUSPEND,
+	DECON_DOZE_STATE_DOZE_SUSPEND
+};
+
 #define MAX_VPP_LOG 10
+
 /* IOCTL commands */
 #define S3CFB_WIN_POSITION              _IOW('F', 203, \
 struct decon_user_window)
@@ -174,5 +182,7 @@ struct s3c_fb_user_ion_client)
 #define S3CFB_WIN_CONFIG                _IOW('F', 209, \
 struct decon_win_config_data)
 #define S3CFB_WIN_PSR_EXIT              _IOW('F', 210, int)
+
+#define S3CFB_POWER_MODE		_IOW('F', 223, __u32)
 
 #endif
