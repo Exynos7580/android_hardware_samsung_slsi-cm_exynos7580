@@ -79,7 +79,7 @@ inline decon_pixel_format halFormatToSocFormat(int format)
     }
 }
 
-static decon_idma_type getIdmaType(int32_t index)
+static decon_idma_type __unused getIdmaType(int32_t index)
 {
     decon_idma_type ret = IDMA_G0;
 
@@ -116,7 +116,7 @@ static decon_idma_type getIdmaType(int32_t index)
     return ret;
 }
 
-static bool isVppType(enum decon_idma_type idma_type)
+static bool __unused isVppType(enum decon_idma_type idma_type)
 {
     switch (idma_type) {
     case IDMA_VG0:

@@ -359,7 +359,7 @@ static const cmpSizes_t sizeTable_[] = {
 
 const cmpSizes_t* getCmpSizeInfo(uint32_t cmdId)
 {
-    int i = 0;
+    unsigned int i = 0;
     for ( i = 0; i < sizeof(sizeTable_)/sizeof(cmpSizes_t); i++)
     {
         if (cmdId == sizeTable_[i].cmdId)

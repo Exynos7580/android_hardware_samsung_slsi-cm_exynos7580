@@ -539,7 +539,7 @@ mcResult_t MobiCoreDevice::openSession(
 
 mcResult_t MobiCoreDevice::checkLoad(
     loadDataOpenSession_ptr         pLoadDataOpenSession,
-    mcDrvRspOpenSessionPayload_ptr  pRspOpenSessionPayload)
+    mcDrvRspOpenSessionPayload_ptr  pRspOpenSessionPayload __unused)
 {
     do {
         // Write MCP open message to buffer
@@ -885,7 +885,7 @@ mcResult_t MobiCoreDevice::getMobiCoreVersion(
 }
 
 //------------------------------------------------------------------------------
-mcResult_t MobiCoreDevice::loadToken(Connection        *deviceConnection,
+mcResult_t MobiCoreDevice::loadToken(Connection        *deviceConnection __unused,
                                      loadTokenData_ptr pLoadTokenData)
 {
     do {

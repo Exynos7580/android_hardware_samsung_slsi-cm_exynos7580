@@ -163,10 +163,10 @@ mcResult_t CMcKMod::mapMCI(
 
 //------------------------------------------------------------------------------
 mcResult_t CMcKMod::mapPersistent(
-    uint32_t    len,
-    uint32_t    *pHandle,
-    addr_t      *pVirtAddr,
-    addr_t      *pPhysAddr)
+    uint32_t    len __unused,
+    uint32_t    *pHandle __unused,
+    addr_t      *pVirtAddr __unused,
+    addr_t      *pPhysAddr __unused)
 {
     // Not currently supported by the driver
     LOG_E("<t-base Driver doesn't support persistent buffers");

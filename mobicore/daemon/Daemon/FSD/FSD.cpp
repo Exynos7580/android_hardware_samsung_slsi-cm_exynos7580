@@ -72,7 +72,7 @@ void FSD::run(
     void
 )
 {
-	struct stat st = {0};
+	struct stat st;
 	mcResult_t ret;
 	string storage = getTlRegistryPath()+"/TbStorage";
 	const char* tbstpath = storage.c_str();
