@@ -175,4 +175,12 @@ struct s3c_fb_user_ion_client)
 struct decon_win_config_data)
 #define S3CFB_WIN_PSR_EXIT              _IOW('F', 210, int)
 
+#define S3CFB_POWER_MODE		_IOW('F', 223, __u32)
+
+enum disp_pwr_mode {
+	DECON_POWER_MODE_OFF = 0,
+	DECON_POWER_MODE_DOZE,
+	DECON_POWER_MODE_NORMAL,
+	DECON_POWER_MODE_DOZE_SUSPEND,
+};
 #endif
