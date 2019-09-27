@@ -39,6 +39,7 @@ struct s3c_fb_user_ion_client {
 };
 
 enum decon_idma_type {
+    IDMA_ERR = -1,
     IDMA_G0 = 0x0,
 	IDMA_G1,
 	IDMA_VG0,

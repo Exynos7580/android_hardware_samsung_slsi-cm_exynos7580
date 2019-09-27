@@ -29,7 +29,7 @@
 #define FIMD_ADDED_BURSTLEN_BYTES     4
 #define FIMD_BW_OVERLAP_CHECK
 
-#define DUAL_VIDEO_OVERLAY_SUPPORT
+//#define DUAL_VIDEO_OVERLAY_SUPPORT
 
 /* Framebuffer API specific defines (decon.h) */
 #define WIN_STATE_DISABLED  decon_win_config::DECON_WIN_STATE_DISABLED
@@ -39,7 +39,7 @@
 #define BLENDING_MAX        DECON_BLENDING_MAX
 #define PIXEL_FORMAT_MAX    DECON_PIXEL_FORMAT_MAX
 
-const size_t SOC_NUM_HW_WINDOWS = 5;
+const size_t SOC_NUM_HW_WINDOWS = 3;
 
 typedef decon_win_config fb_win_config;
 typedef decon_win_config_data fb_win_config_data;
@@ -81,7 +81,7 @@ inline decon_pixel_format halFormatToSocFormat(int format)
 
 static decon_idma_type getIdmaType(int32_t index)
 {
-    decon_idma_type ret = IDMA_G0;
+    decon_idma_type ret = IDMA_ERR;
 
     switch(index) {
     case 0:
@@ -91,21 +91,9 @@ static decon_idma_type getIdmaType(int32_t index)
         ret = IDMA_G1;
         break;
     case 2:
-        ret = IDMA_VG0;
-        break;
-    case 3:
-        ret = IDMA_VG1;
-        break;
-    case 4:
-        ret = IDMA_VGR0;
-        break;
-    case 5:
-        ret = IDMA_VGR1;
-        break;
-    case 6:
         ret = IDMA_G2;
         break;
-    case 7:
+    case 3:
         ret = IDMA_G3;
         break;
     default:
@@ -131,14 +119,14 @@ static bool isVppType(enum decon_idma_type idma_type)
 
 #ifdef FIMD_BW_OVERLAP_CHECK
 const size_t MAX_NUM_FIMD_DMA_CH = 2;
-const uint32_t FIMD_DMA_CH_IDX[] = {0, 1, 1, 1, 0};
+const uint32_t FIMD_DMA_CH_IDX[] = {0, 1, 0};
 const uint32_t FIMD_DMA_CH_BW_SET1[MAX_NUM_FIMD_DMA_CH] = {1920 * 1080 *2, 1920 * 1080 *2};
 const uint32_t FIMD_DMA_CH_BW_SET2[MAX_NUM_FIMD_DMA_CH] = {2560 * 1600, 2560 * 1600 *2};
 const uint32_t FIMD_DMA_CH_OVERLAP_CNT_SET1[MAX_NUM_FIMD_DMA_CH] = {2, 2};
 const uint32_t FIMD_DMA_CH_OVERLAP_CNT_SET2[MAX_NUM_FIMD_DMA_CH] = {1, 2};
 
 inline void fimd_bw_overlap_limits_init(int xres, int yres,
-            uint32_t *fimd_dma_chan_max_bw, uint32_t *fimd_dma_chan_max_overlap_cnt)
+            uint32_t fimd_dma_chan_max_bw[MAX_NUM_FIMD_DMA_CH], uint32_t fimd_dma_chan_max_overlap_cnt[MAX_NUM_FIMD_DMA_CH])
 {
     if (xres * yres > 1920 * 1080) {
         for (size_t i = 0; i < MAX_NUM_FIMD_DMA_CH; i++) {
@@ -169,9 +157,12 @@ const size_t WFD_GSC_DRM_IDX = 3;
 #endif
 const int FIMD_GSC_USAGE_IDX[] = {FIMD_GSC_IDX, FIMD_GSC_SEC_IDX};
 #ifdef USES_VIRTUAL_DISPLAY
-const int AVAILABLE_GSC_UNITS[] = { 0, 1, 1, 1 };
+const int AVAILABLE_GSC_UNITS[] = { 4, 5};
+//const int AVAILABLE_GSC_UNITS[] = { 0, 1, 0, 0, 1, 1 };
+
 #else
-const int AVAILABLE_GSC_UNITS[] = { 0, 1, 1, 5 };
+const int AVAILABLE_GSC_UNITS[] = { 4, 5};
+//const int AVAILABLE_GSC_UNITS[] = { 0, 1, 0, 0, 1, 1 };
 #endif
 
 #endif
